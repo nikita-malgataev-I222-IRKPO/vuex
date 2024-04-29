@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo List</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuex@3.6.2/dist/vuex.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <h1>Todo List</h1>
+    <input v-model="newTask" @keyup.enter="addTask">
+    <button @click="clearCompleted">Clear Completed</button>
+    <ul>
+      <li v-for="task in tasks" :key="task.id">
+        <input type="checkbox" v-model="task.completed"> {{ task.title }}
+      </li>
+    </ul>
+  </div>
+
+  <script>
+    const store = new Vuex.Store({
+      state: {
+        tasks: [
+          { id: 1, title: 'Learn Vue', completed: false },
+          { id: 2, title: 'Build a project', completed: true }
+        ],
+        newTask: ''
+      },
+      mutations: {
+        addTask(state) {
+          state.tasks.push({ id: Date.now(), title: state.newTask, completed: false });
+          state.newTask = '';
+        },
+        clearCompleted(state) {
+          state.tasks = state.tasks.filter(task => !task.completed);
+        }
+      }
+    });
+
+    const app = new Vue({
+      el: '#app',
+      store,
+      computed: {
+        tasks() {
+          return this.$store.state.tasks;
+        },
+        newTask: {
+          get() {
+            return this.$store.state.newTask;
+          },
+          set(value) {
+            this.$store.state.newTask = value;
+          }
+        }
+      },
+      methods: {
+        addTask() {
+          this.$store.commit('addTask');
+        },
+        clearCompleted() {
+          this.$store.commit('clearCompleted');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
